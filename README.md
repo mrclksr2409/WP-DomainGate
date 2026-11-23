@@ -4,7 +4,7 @@ WordPress-Plugin, das die Benutzerregistrierung auf E-Mail-Adressen aus freigege
 
 ## Funktionen
 
-- Whitelist für E-Mail-Domains unter **Einstellungen → DomainGate**
+- Whitelist für E-Mail-Domains unter **Einstellungen → DomainGate** (Oberfläche mit [WP-Backend UI](https://github.com/mrclksr2409/WP-Backend))
 - Unterstützte Schreibweisen (eine pro Zeile):
   - `domain.de` oder `*@domain.de`: nur genau diese Domain
   - `*.domain.de`: alle Subdomains (z. B. `mail.domain.de`)
@@ -17,6 +17,20 @@ WordPress-Plugin, das die Benutzerregistrierung auf E-Mail-Adressen aus freigege
 1. Ordner nach `wp-content/plugins/domaingate` kopieren
 2. Plugin im WordPress-Backend aktivieren
 3. Unter **Einstellungen → DomainGate** die erlaubten Domains eintragen
+
+## Updates
+
+Updates kommen über den [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker) direkt aus diesem Repository. Releases und Tags werden ignoriert, maßgeblich ist die Version im Plugin-Header des jeweiligen Branches:
+
+- `main`: stabile Versionen (Standard)
+- `beta`: Vorabversionen, aktivierbar unter **Einstellungen → DomainGate → Beta-Updates**
+
+Für ein Update die Version in `domaingate.php` (Header und `DOMAINGATE_VERSION`) erhöhen und auf den Branch pushen.
+
+## Mitgelieferte Bibliotheken
+
+- `lib/wp-backend-ui/`: WP-Backend UI 1.1.0 (unveränderte Kopie, Änderungen nur im Repository WP-Backend)
+- `vendor/plugin-update-checker/`: Plugin Update Checker 5.x
 
 ## Entwickler-Hook
 

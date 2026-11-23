@@ -1,59 +1,37 @@
 <?php
 /**
  * Plugin Name:       DomainGate – Restrict Registration by Email Domain
+ * Plugin URI:        https://github.com/mrclksr2409/WP-DomainGate
  * Description:       Erlaubt die Registrierung nur für E-Mail-Adressen aus freigegebenen Domains (z. B. *@domain.de).
- * Version:           0.1.0
- * Requires at least: 5.8
- * Requires PHP:      7.4
+ * Version:           0.2.0
+ * Requires at least: 5.5
+ * Requires PHP:      7.2
+ * Author:            Marcel Kaiser
+ * Author URI:        https://github.com/mrclksr2409
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       domaingate
+ * Domain Path:       /languages
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'DOMAINGATE_VERSION', '0.1.0' );
-define( 'DOMAINGATE_OPTION', 'domaingate_allowed_domains' );
+define( 'DOMAINGATE_VERSION', '0.2.0' );
+define( 'DOMAINGATE_FILE', __FILE__ );
+define( 'DOMAINGATE_PATH', plugin_dir_path( __FILE__ ) );
 
-require_once __DIR__ . '/includes/class-domaingate-validator.php';
-require_once __DIR__ . '/includes/class-domaingate-settings.php';
+// Shared admin design system (bundled library, newest copy across plugins wins).
+require_once DOMAINGATE_PATH . 'lib/wp-backend-ui/wp-backend-ui.php';
 
-/**
- * Prüft die E-Mail bei der Standard-Registrierung (wp-login.php?action=register).
- */
-add_filter(
-	'registration_errors',
-	function ( $errors, $sanitized_user_login, $user_email ) {
-		if ( ! DomainGate_Validator::is_allowed( $user_email ) ) {
-			$errors->add(
-				'domaingate_not_allowed',
-				__( '<strong>Fehler:</strong> Registrierungen sind nur mit einer E-Mail-Adresse aus einer freigegebenen Domain möglich.', 'domaingate' )
-			);
-		}
-		return $errors;
-	},
-	10,
-	3
-);
+require_once DOMAINGATE_PATH . 'includes/class-domaingate-settings.php';
+require_once DOMAINGATE_PATH . 'includes/class-domaingate-validator.php';
+require_once DOMAINGATE_PATH . 'includes/class-domaingate-updater.php';
+require_once DOMAINGATE_PATH . 'includes/class-domaingate.php';
 
-/**
- * Prüft die E-Mail bei Multisite-Registrierungen (wp-signup.php).
- */
-add_filter(
-	'wpmu_validate_user_signup',
-	function ( $result ) {
-		if ( ! DomainGate_Validator::is_allowed( $result['user_email'] ) ) {
-			$result['errors']->add(
-				'user_email',
-				__( 'Registrierungen sind nur mit einer E-Mail-Adresse aus einer freigegebenen Domain möglich.', 'domaingate' )
-			);
-		}
-		return $result;
-	}
-);
+wpb_admin_ui_register( array( 'pages' => array( DomainGate_Settings::PAGE_SLUG ) ) );
 
-if ( is_admin() ) {
-	new DomainGate_Settings();
-}
+register_activation_hook( __FILE__, array( 'DomainGate_Settings', 'set_defaults_on_activate' ) );
+
+add_action( 'plugins_loaded', array( 'DomainGate', 'instance' ) );
